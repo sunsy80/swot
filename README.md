@@ -10,14 +10,17 @@
 
 | 规则名称 | 原始 JSON 规则 | 编译 SRS 规则 | 说明 | 建议路由 |
 | :--- | :--- | :--- | :--- | :--- |
-| **TradingView 核心服务** | [`tradingview.json`](rules/tradingview.json) | `tradingview.srs` | 行情数据、Pine 脚本引擎、选股器、图表云存储、实时推流等核心业务 | `proxy` |
-| **TradingView 广告追踪** | [`tradingview-ads.json`](rules/tradingview-ads.json) | `tradingview-ads.srs` | Snowplow 数据打点、交互行为追踪与广告曝光像素 | `block` |
+| **TradingView 核心服务** | [`tradingview.json`](rules/tradingview.json) | `tradingview.srs` | 主站入口、静态资源CDN、客户端更新、行情数据、Pine 脚本、选股器、图表云存储、实时推流等核心业务 | `proxy` |
+| **TradingView 广告与遥测** | [`tradingview-ads.json`](rules/tradingview-ads.json) | `tradingview-ads.srs` | Snowplow 数据打点、交互行为追踪、广告曝光像素与客户端崩溃遥测分析 | `block` |
 
 ---
 
 ## 包含域名明细
 
-### 1. `tradingview` (核心服务与数据流)
+### 1. `tradingview` (核心业务与数据流，共 10 个域名)
+- `www.tradingview.com`：主站前端网页服务与核心入口
+- `s3.tradingview.com`：静态资源托管节点（JS/CSS 脚本包、图表静态图标等素材）
+- `tvd-packages.tradingview.com`：桌面端/客户端专用依赖包分发接口（TradingView Desktop 组件更新与运行库）
 - `pine-facade.tradingview.com`：Pine Script 脚本引擎网关（编译与回测请求调度门面）
 - `news-mediator.tradingview.com`：财经快讯流聚合与中介调度
 - `scanner.tradingview.com`：选股器/筛选器（多品种指标扫描过滤）
@@ -26,8 +29,9 @@
 - `pushstream.tradingview.com`：WebSocket / TCP 实时长连接行情推送
 - `data.tradingview.com`：K 线历史 Bar 数据与基本面财务数据接口
 
-### 2. `tradingview-ads` (分析与打点)
-- `snowplow-pixel.tradingview.com`：Snowplow 行为分析打点像素（阻断不影响交易与图表功能）
+### 2. `tradingview-ads` (广告追踪与遥测诊断，共 2 个域名)
+- `snowplow-pixel.tradingview.com`：Snowplow 行为分析打点像素（广告曝光与点击流统计）
+- `telemetry.tradingview.com`：遥测与诊断数据收集节点（客户端崩溃日志、运行性能及系统统计指标）
 
 ---
 
@@ -73,7 +77,7 @@
 > **提示**：
 > - 直连 GitHub Raw 链接为：`https://raw.githubusercontent.com/sunsy80/swot/main/rules/<规则名>.srs`
 > - 国内网络环境下推荐使用 jsDelivr CDN 加速链接：`https://fastly.jsdelivr.net/gh/sunsy80/swot@main/rules/<规则名>.srs`
-> - sing-box 匹配遵循**从上到下**原则，拦截规则（`tv-ads`）必须置于代理规则（`tv-core`）之前。
+> - sing-box 匹配遵循**自上而下、先匹配先生效**原则，拦截规则（`tv-ads`）必须置于代理规则（`tv-core`）之前。
 
 ---
 
@@ -95,6 +99,6 @@
    }
    ```
 3. 执行 `git push` 推送至 GitHub：
-   - GitHub Actions 会在 10 秒内自动拉取最新版 sing-box；
+   - GitHub Actions 会自动拉取最新版 sing-box；
    - 自动将 `rules/*.json` 批量编译为同名 `rules/*.srs`；
    - 自动将生成的二进制 `.srs` 文件 Commit 并 Push 回仓库，无需手动干预。

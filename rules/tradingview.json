@@ -3,6 +3,9 @@
   "rules": [
     {
       "domain": [
+        "www.tradingview.com",
+        "s3.tradingview.com",
+        "tvd-packages.tradingview.com",
         "pine-facade.tradingview.com",
         "news-mediator.tradingview.com",
         "scanner.tradingview.com",

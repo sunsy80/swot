@@ -3,7 +3,8 @@
   "rules": [
     {
       "domain": [
-        "snowplow-pixel.tradingview.com"
+        "snowplow-pixel.tradingview.com",
+        "telemetry.tradingview.com"
       ]
     }
   ]
