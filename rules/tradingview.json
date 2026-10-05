@@ -9,6 +9,8 @@
         "pine-facade.tradingview.com",
         "news-mediator.tradingview.com",
         "scanner.tradingview.com",
+        "scanner-backend.tradingview.com",
+        "pricealerts.tradingview.com",
         "charts-storage.tradingview.com",
         "notifications.tradingview.com",
         "pushstream.tradingview.com",

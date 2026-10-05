@@ -10,22 +10,24 @@
 
 | 规则名称 | 原始 JSON 规则 | 编译 SRS 规则 | 说明 | 建议路由 |
 | :--- | :--- | :--- | :--- | :--- |
-| **TradingView 核心服务** | [`tradingview.json`](rules/tradingview.json) | `tradingview.srs` | 主站入口、静态资源CDN、客户端更新、行情数据、Pine 脚本、选股器、图表云存储、实时推流等核心业务 | `proxy` |
+| **TradingView 核心服务** | [`tradingview.json`](rules/tradingview.json) | `tradingview.srs` | 主站入口、CDN静态资源、客户端依赖、行情Bar、Pine 脚本引擎、品种选股器前后端、价格预警、图表云存储、实时推流等核心业务 | `proxy` |
 | **TradingView 广告与遥测** | [`tradingview-ads.json`](rules/tradingview-ads.json) | `tradingview-ads.srs` | Snowplow 数据打点、交互行为追踪、广告曝光像素与客户端崩溃遥测分析 | `block` |
 
 ---
 
 ## 包含域名明细
 
-### 1. `tradingview` (核心业务与数据流，共 10 个域名)
+### 1. `tradingview` (核心业务与数据流，共 12 个域名)
 - `www.tradingview.com`：主站前端网页服务与核心入口
 - `s3.tradingview.com`：静态资源托管节点（JS/CSS 脚本包、图表静态图标等素材）
-- `tvd-packages.tradingview.com`：桌面端/客户端专用依赖包分发接口（TradingView Desktop 组件更新与运行库）
+- `tvd-packages.tradingview.com`：桌面端专用依赖包分发接口（TradingView Desktop 组件更新与运行库）
 - `pine-facade.tradingview.com`：Pine Script 脚本引擎网关（编译与回测请求调度门面）
 - `news-mediator.tradingview.com`：财经快讯流聚合与中介调度
-- `scanner.tradingview.com`：选股器/筛选器（多品种指标扫描过滤）
+- `scanner.tradingview.com`：选股器/筛选器前端服务（多品种指标扫描过滤）
+- `scanner-backend.tradingview.com`：选股器核心计算后端（股票/外汇/加密货币条件批量筛选与计算接口）
+- `pricealerts.tradingview.com`：价格预警服务（用户设定的价格警报与触发条件监听）
 - `charts-storage.tradingview.com`：画线、指标模板与图表布局云存储
-- `notifications.tradingview.com`：价格预警与系统通知中心
+- `notifications.tradingview.com`：价格预警推送与系统通知中心
 - `pushstream.tradingview.com`：WebSocket / TCP 实时长连接行情推送
 - `data.tradingview.com`：K 线历史 Bar 数据与基本面财务数据接口
 
