@@ -1,0 +1,59 @@
+name: Compile sing-box Rule Sets
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'rules/*.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup sing-box
+        run: |
+          echo "Fetching latest sing-box release..."
+          TAG=$(curl -sSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r .tag_name)
+          if [ -z "$TAG" ] || [ "$TAG" = "null" ]; then
+            TAG="v1.11.4"
+          fi
+          VERSION=${TAG#v}
+          echo "Selected sing-box version: ${TAG}"
+          curl -Lo sing-box.tar.gz "https://github.com/SagerNet/sing-box/releases/download/${TAG}/sing-box-${VERSION}-linux-amd64.tar.gz"
+          tar -xzf sing-box.tar.gz --strip-components=1
+          sudo mv sing-box /usr/local/bin/
+          sing-box version
+
+      - name: Compile JSON to SRS
+        run: |
+          mkdir -p rules
+          for file in rules/*.json; do
+            if [ -f "$file" ]; then
+              base=$(basename "$file" .json)
+              echo "Compiling $file -> rules/${base}.srs"
+              sing-box rule-set compile "$file" -o "rules/${base}.srs"
+            fi
+          done
+
+      - name: Commit and Push SRS files
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add rules/*.srs
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore(rules): auto-compile rule sets to srs [skip ci]"
+            git push
+          fi
